@@ -1,0 +1,6 @@
+{
+  "name": "SkillPulse",
+  "description": "Modern online learning platform for Study and YouTube Automation courses with Pakistan payment support (JazzCash & Easypaisa) and administrator dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
