@@ -389,7 +389,7 @@ fun HomeScreen(
             }
         }
 
-        // Category Filter Tabs (All, 📚 Study Courses, 🎬 YouTube Automation)
+        // Categories Filter Chips
         item {
             Spacer(modifier = Modifier.height(14.dp))
             SectionHeader(
@@ -418,6 +418,70 @@ fun HomeScreen(
                     onClick = { homeCategoryTab = "YOUTUBE" },
                     label = { Text("🎬 YouTube (${youtubeCourses.size})") }
                 )
+            }
+        }
+
+        // Fresh / Empty State when no courses have been uploaded yet
+        if (allCourses.isEmpty()) {
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(64.dp)
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CloudUpload,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(36.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text(
+                            text = "Fresh Platform Ready for Your Courses!",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Spacer(modifier = Modifier.height(6.dp))
+
+                        Text(
+                            text = "All previous sample courses have been cleared. As admin, you can now start uploading your Study and YouTube Automation courses, set your PKR pricing, and collect payments directly via JazzCash & Easypaisa.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = 18.sp,
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Button(
+                            onClick = { viewModel.navigateTo(Screen.AdminLogin) },
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Icon(Icons.Default.AddCircleOutline, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Open Admin Portal & Add Courses")
+                        }
+                    }
+                }
             }
         }
 
@@ -479,59 +543,62 @@ fun HomeScreen(
             }
         }
 
-        // Free Lessons & Previews Section
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-            SectionHeader(
-                title = "Free Lessons & Previews",
-                subtitle = "Sample curriculum before purchasing"
-            )
+        // Free Lessons & Previews Section (Render only if courses exist)
+        if (allCourses.isNotEmpty()) {
+            item {
+                val previewCourse = allCourses.first()
+                Spacer(modifier = Modifier.height(16.dp))
+                SectionHeader(
+                    title = "Free Lessons & Previews",
+                    subtitle = "Sample curriculum before purchasing"
+                )
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Column(modifier = Modifier.padding(14.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Surface(
-                                color = BrandEmeraldGreen,
-                                shape = RoundedCornerShape(4.dp)
-                            ) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    Column(modifier = Modifier.padding(14.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Surface(
+                                    color = BrandEmeraldGreen,
+                                    shape = RoundedCornerShape(4.dp)
+                                ) {
+                                    Text(
+                                        text = "FREE PREVIEW",
+                                        color = Color.White,
+                                        fontSize = 9.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "FREE PREVIEW",
-                                    color = Color.White,
-                                    fontSize = 9.sp,
+                                    text = previewCourse.title,
                                     fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    fontSize = 13.sp
+                                )
+                                Text(
+                                    text = "Instructor: ${previewCourse.instructor} • ${previewCourse.duration}",
+                                    fontSize = 11.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "YouTube Automation: The 10-Second Hook Psychology",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
-                            )
-                            Text(
-                                text = "Instructor: Hamza Malik • 21 Mins",
-                                fontSize = 11.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
 
-                        Button(
-                            onClick = { onNavigateToCourse(7L) },
-                            shape = RoundedCornerShape(8.dp),
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
-                        ) {
-                            Text("Watch", fontSize = 12.sp)
+                            Button(
+                                onClick = { onNavigateToCourse(previewCourse.id) },
+                                shape = RoundedCornerShape(8.dp),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                            ) {
+                                Text("View", fontSize = 12.sp)
+                            }
                         }
                     }
                 }

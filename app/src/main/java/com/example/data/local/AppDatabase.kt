@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
         CartItemEntity::class,
         WishlistItemEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -53,15 +53,6 @@ abstract class AppDatabase : RoomDatabase() {
                     "skillpulse_database"
                 )
                     .fallbackToDestructiveMigration()
-                    .addCallback(object : Callback() {
-                        override fun onCreate(db: SupportSQLiteDatabase) {
-                            super.onCreate(db)
-                            // Initial seed triggered on database creation
-                            CoroutineScope(Dispatchers.IO).launch {
-                                getInstance(context).seedInitialData()
-                            }
-                        }
-                    })
                     .build()
                 INSTANCE = instance
                 instance

@@ -43,6 +43,16 @@ class CourseRepository(private val db: AppDatabase) {
 
     suspend fun deleteCourse(id: Long) {
         courseDao.deleteCourseById(id)
+        lessonDao.deleteLessonsForCourse(id)
+        resourceDao.deleteResourcesForCourse(id)
+        quizDao.deleteQuestionsForCourse(id)
+    }
+
+    suspend fun clearAllCoursesData() {
+        courseDao.clearAllCourses()
+        lessonDao.clearAllLessons()
+        resourceDao.clearAllResources()
+        quizDao.clearAllQuestions()
     }
 }
 
@@ -232,8 +242,8 @@ class AdminRepository(private val db: AppDatabase) {
     val announcements: Flow<List<AnnouncementEntity>> = announcementDao.getAllAnnouncements()
 
     // Secure authentication with PBKDF2/SHA-256 hash
-    // Default initial password hash for "Admin@2026" or user-configured secret
-    private val defaultAdminHash = sha256("Admin@2026")
+    // User credentials: email msuhailsodhar@gmail.com, password Sodhar56@123
+    private val defaultAdminHash = sha256("Sodhar56@123")
     private var customAdminHash: String? = null
 
     private var failedAttempts = 0
@@ -249,8 +259,7 @@ class AdminRepository(private val db: AppDatabase) {
         val targetHash = customAdminHash ?: defaultAdminHash
         val inputHash = sha256(inputPass)
 
-        val success = (email.trim().equals("itssohailsodhar@gmail.com", ignoreCase = true) ||
-                email.trim().equals("admin@skillpulse.pk", ignoreCase = true)) &&
+        val success = email.trim().equals("msuhailsodhar@gmail.com", ignoreCase = true) &&
                 inputHash == targetHash
 
         if (success) {

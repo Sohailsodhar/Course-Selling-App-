@@ -36,6 +36,9 @@ interface CourseDao {
     @Query("DELETE FROM courses WHERE id = :id")
     suspend fun deleteCourseById(id: Long)
 
+    @Query("DELETE FROM courses")
+    suspend fun clearAllCourses()
+
     @Query("SELECT COUNT(*) FROM courses")
     suspend fun getCourseCount(): Int
 }
@@ -59,6 +62,12 @@ interface LessonDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLesson(lesson: LessonEntity): Long
+
+    @Query("DELETE FROM lessons WHERE courseId = :courseId")
+    suspend fun deleteLessonsForCourse(courseId: Long)
+
+    @Query("DELETE FROM lessons")
+    suspend fun clearAllLessons()
 }
 
 @Dao
@@ -68,6 +77,12 @@ interface ResourceDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertResources(resources: List<ResourceEntity>)
+
+    @Query("DELETE FROM resources WHERE courseId = :courseId")
+    suspend fun deleteResourcesForCourse(courseId: Long)
+
+    @Query("DELETE FROM resources")
+    suspend fun clearAllResources()
 }
 
 @Dao
@@ -80,6 +95,12 @@ interface QuizDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertQuestions(questions: List<QuizQuestionEntity>)
+
+    @Query("DELETE FROM quiz_questions WHERE courseId = :courseId")
+    suspend fun deleteQuestionsForCourse(courseId: Long)
+
+    @Query("DELETE FROM quiz_questions")
+    suspend fun clearAllQuestions()
 }
 
 @Dao

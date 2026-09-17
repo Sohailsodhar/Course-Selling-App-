@@ -34,8 +34,8 @@ fun AdminLoginScreen(
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
-    var email by remember { mutableStateOf("admin@skillpulse.pk") }
-    var password by remember { mutableStateOf("Admin@2026") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isLoading by remember { mutableStateOf(false) }
 
@@ -150,28 +150,6 @@ fun AdminLoginScreen(
                     Text("Secure Login", fontWeight = FontWeight.Bold)
                 }
             }
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            Surface(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(10.dp)) {
-                    Text(
-                        text = "ℹ️ Demo Admin Credentials:",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = "Email: admin@skillpulse.pk\nPassword: Admin@2026",
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
         }
     }
 }
@@ -197,6 +175,7 @@ fun AdminDashboardScreen(
 
     // Course edit dialog state
     var showAddCourseDialog by remember { mutableStateOf(false) }
+    var showClearAllCoursesDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -455,14 +434,70 @@ fun AdminDashboardScreen(
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         item {
-                            Button(
-                                onClick = { showAddCourseDialog = true },
+                            Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(8.dp)
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Icon(Icons.Default.Add, contentDescription = null)
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text("Add New Course")
+                                Button(
+                                    onClick = { showAddCourseDialog = true },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Icon(Icons.Default.Add, contentDescription = null)
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("Add New Course")
+                                }
+
+                                if (allCourses.isNotEmpty()) {
+                                    OutlinedButton(
+                                        onClick = { showClearAllCoursesDialog = true },
+                                        shape = RoundedCornerShape(8.dp),
+                                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                                    ) {
+                                        Icon(Icons.Default.DeleteSweep, contentDescription = null)
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("Clear All")
+                                    }
+                                }
+                            }
+                        }
+
+                        if (allCourses.isEmpty()) {
+                            item {
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 24.dp),
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(24.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Icon(
+                                            Icons.Default.School,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(48.dp)
+                                        )
+                                        Spacer(modifier = Modifier.height(12.dp))
+                                        Text(
+                                            "No courses in database",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 16.sp
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            "The platform is completely clean! Tap 'Add New Course' above to upload your first study or YouTube course and set your price.",
+                                            fontSize = 12.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                        )
+                                    }
+                                }
                             }
                         }
 
@@ -734,6 +769,45 @@ fun AdminDashboardScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showAddCourseDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // Clear All Courses Confirmation Dialog
+    if (showClearAllCoursesDialog) {
+        AlertDialog(
+            onDismissRequest = { showClearAllCoursesDialog = false },
+            icon = {
+                Icon(
+                    Icons.Default.Warning,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(32.dp)
+                )
+            },
+            title = { Text("Clear All Courses?") },
+            text = {
+                Text(
+                    "This will delete all courses, associated lessons, resources, and quizzes from the database. You will get a completely fresh app to upload your own courses. This action cannot be undone."
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.deleteAllCourses {
+                            showClearAllCoursesDialog = false
+                            Toast.makeText(context, "All courses cleared! Platform is fresh and clean.", Toast.LENGTH_LONG).show()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Yes, Delete All")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearAllCoursesDialog = false }) {
                     Text("Cancel")
                 }
             }

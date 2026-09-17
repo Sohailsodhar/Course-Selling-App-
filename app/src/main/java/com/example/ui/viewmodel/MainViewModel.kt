@@ -142,7 +142,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _isAdminLoggedIn = MutableStateFlow(false)
     val isAdminLoggedIn: StateFlow<Boolean> = _isAdminLoggedIn.asStateFlow()
 
-    private val _adminEmail = MutableStateFlow("admin@skillpulse.pk")
+    private val _adminEmail = MutableStateFlow("msuhailsodhar@gmail.com")
     val adminEmail: StateFlow<String> = _adminEmail.asStateFlow()
 
     val allOrdersAdmin: StateFlow<List<OrderEntity>> = orderRepo.allOrders
@@ -205,6 +205,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteCourse(courseId: Long) {
         viewModelScope.launch {
             courseRepo.deleteCourse(courseId)
+        }
+    }
+
+    fun deleteAllCourses(onComplete: () -> Unit = {}) {
+        viewModelScope.launch {
+            courseRepo.clearAllCoursesData()
+            onComplete()
         }
     }
 
